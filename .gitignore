@@ -1,2 +1,8 @@
 ./edvenv
 edvenv
+
+./build.sh
+build
+
+./dist
+dist
