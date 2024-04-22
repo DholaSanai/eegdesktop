@@ -68,36 +68,36 @@ def main(analysis_name, file_path_list, channels, scales, length, frequency):
   data4 = multi_subject_and_single_channel(Mobj, fixed_channels, scales, frequency, length, file_path_list)
 
 
-  print("================= FINAL OUTPUT =================")
+  # print("================= FINAL OUTPUT =================")
   fun_obj = {
             'fun1 data': fun_1,
             'fun2 data': fun_2,
             'fun3 data': json.dumps(fun_3),
             'fun4 data': json.dumps(data4)
             }
-  print(fun_obj)
-  first_function = {
-     'data': fun_1
-  }
-  second_function = {
-      'data': fun_2
-    }
-  third_function = {
-      'data': fun_3
-    }
-  fourth_function = {
-      'data': data4
-    }
-  response = {
-    'first_function': first_function,
-    'second_function': second_function,
-    'third_function': third_function,
-    'fourth_function': fourth_function
-  }
+  # print(fun_obj)
+  # first_function = {
+  #    'data': fun_1
+  # }
+  # second_function = {
+  #     'data': fun_2
+  #   }
+  # third_function = {
+  #     'data': fun_3
+  #   }
+  # fourth_function = {
+  #     'data': data4
+  #   }
+  # response = {
+  #   'first_function': first_function,
+  #   'second_function': second_function,
+  #   'third_function': third_function,
+  #   'fourth_function': fourth_function
+  # }
   f= open("eeg.txt","w+")
   f.write(json.dumps(str(fun_obj)))
-  # print("here is file path")
-  # print(os.path.abspath("eeg.txt"))
+  print("here is file path")
+  print(os.path.abspath("eeg.txt"))
 
 
 def get_subject_data(paths):
