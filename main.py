@@ -62,42 +62,40 @@ def main(analysis_name, file_path_list, channels, scales, length, frequency):
     data2 = single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_multi_channel(Mobj, fixed_channels, scales, frequency, length, file_path)
     fun_2.append(data2)
 
+  ############################FUNCTION 3############################
   data3 = multi_subject_and_multi_channel(Mobj, fixed_channels, scales, frequency, length, file_path_list)
-  fun_3 = data3
 
+  ############################FUNCTION 4############################
   data4 = multi_subject_and_single_channel(Mobj, fixed_channels, scales, frequency, length, file_path_list)
 
 
   # print("================= FINAL OUTPUT =================")
-  fun_obj = {
-            'fun1 data': fun_1,
-            'fun2 data': fun_2,
-            'fun3 data': json.dumps(fun_3),
-            'fun4 data': json.dumps(data4)
-            }
+  
   # print(fun_obj)
-  # first_function = {
-  #    'data': fun_1
-  # }
-  # second_function = {
-  #     'data': fun_2
-  #   }
+  first_function = {
+    "data": fun_1
+  }
+  second_function = {
+    "data": fun_2
+    }
   # third_function = {
   #     'data': fun_3
   #   }
   # fourth_function = {
   #     'data': data4
   #   }
-  # response = {
-  #   'first_function': first_function,
-  #   'second_function': second_function,
-  #   'third_function': third_function,
-  #   'fourth_function': fourth_function
-  # }
-  f= open("eeg.txt","w+")
-  f.write(json.dumps(str(fun_obj)))
+
+  fun_obj = {
+            "fun1 data": first_function,
+            "fun2 data": second_function,
+            "fun3 data": data3,
+            "fun4 data": data4
+            }
+  print(json.dumps(fun_obj))
+  f= open(f"{analysis_name}.txt","w+")
+  f.write(json.dumps(fun_obj))
   print("here is file path")
-  print(os.path.abspath("eeg.txt"))
+  print(os.path.abspath(f"{analysis_name}.txt"))
 
 
 def get_subject_data(paths):
@@ -157,20 +155,20 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_si
   fig.update_xaxes(tickvals=[target_channel], ticktext=[target_channel], row=1, col=2)
 
   # Show plot
-  fig.show()
+  # fig.show()
 
   fig = go.Figure()
   fig.add_trace(go.Scatter(x=scales_list, y=Msx, mode='lines+markers', line=dict(color='black'),
                            marker=dict(color='black', size=8)))
   fig.update_layout(template='simple_white', width=600, height=400, font=dict(size=20),
                     xaxis_title='Scales', yaxis_title='Sample Entropy')
-  fig.show()
+  # fig.show()
 
   graph_data = {
-        'Sample_Entropy': {
-            'scales_list': scales_list.tolist(),
-            'Msx': Msx.tolist()
-        },
+        # 'Sample_Entropy': {
+        #     'scales_list': scales_list.tolist(),
+        #     'Msx': Msx.tolist()
+        # },
         'Complexity_Index': {
             'channel': target_channel,
             'CI': CI
@@ -230,19 +228,20 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_mu
   fig.update_layout(template='simple_white', width=1800, height=600, font=dict(size=20),
                     xaxis_title='Scales', yaxis_title='Sample Entropy', title_text=file_path)
   fig.update_yaxes(title_text='Complexity Index', row=1, col=2)
-  fig.show()
+  # fig.show()
 
+  mse_values = [arr.tolist() for arr in mse_values]
 
   graph_data = {
-        'Sample_Entropy': {
-            'scales_list': scales_list.tolist(),
-            'mean_mse': mean_mse.tolist(),
-            'sem_mse': sem_mse.tolist(),
-            'mse_vals': mse_values
+        "Sample_Entropy": {
+            "scales_list": scales_list.tolist(),
+            "mean_mse": mean_mse.tolist(),
+            "sem_mse": sem_mse.tolist(),
+            "mse_vals": mse_values
         },
-        'Complexity_Index': {
-            'channel': ch_names,
-            'CI': ci_df['CI'].tolist()
+        "Complexity_Index": {
+            "channel": ch_names.tolist(),
+            "CI": ci_df["CI"].tolist()
         }
     }
   # print("=====================================")
@@ -320,7 +319,7 @@ def multi_subject_and_multi_channel(Mobj, fixed_channels, scales, frequency, len
 
   fig.update_layout(template='simple_white', width=1000, height=600, font=dict(size=20),
                     xaxis_title='Scales', yaxis_title='Sample Entropy')
-  fig.show()
+  # fig.show()
 
   graph_data = {
         'Sample_Entropy': {
