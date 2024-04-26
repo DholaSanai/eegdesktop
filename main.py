@@ -22,9 +22,16 @@ import shutil
 from copy import deepcopy
 import json
 
-def main(analysis_name, file_path_list, channels, scales, length, frequency):
-  for file_path in file_path_list:
-    absolute_path = os.path.abspath(file_path)
+def main(analysis_name, file_paths, channels, scales, length, frequency):
+  file_path_list = []
+  desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+  # print("==============DESKTOP PATH==============")
+  print(desktop_path)
+  for each in file_paths:
+    file_path_list.append(os.path.abspath(os.path.join(desktop_path, each)))
+
+  # for file_path in file_path_list:
+  #   print(file_path)
     # print(absolute_path)
     # print(os.path.exists(absolute_path))
 
@@ -96,11 +103,16 @@ def main(analysis_name, file_path_list, channels, scales, length, frequency):
   f.write(json.dumps(fun_obj))
   print("here is file path")
   print(os.path.abspath(f"{analysis_name}.txt"))
+  os.remove(os.path.abspath(f"{analysis_name}.txt"))
+  print("File Removed!")
 
 
 def get_subject_data(paths):
   # print("IN POINT 4")
-  return pd.read_csv(paths)
+  data = pd.read_csv(paths)
+  print("==============DATA==============")
+  print(data)
+  return data
 
 def get_file_names(complete_file_paths):
   file_names = []
@@ -110,8 +122,11 @@ def get_file_names(complete_file_paths):
 
 def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_single_channel(Mobj, channel, scale, frequency, length, file_path):
   # print("IN POINT 5")
-
+  print("==============FILE PATH==============")
+  print(file_path)
   data = get_subject_data(file_path)
+  print("==============DATA==============")
+  print(data)
   data = data.iloc[:, 1:]
   ch_names = data.columns
   # print("##################### names #####################", ch_names[0])
