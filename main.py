@@ -25,29 +25,10 @@ import json
 def main(analysis_name, file_paths, channels, scales, length, frequency):
   file_path_list = []
   desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-  # print("==============DESKTOP PATH==============")
+  print("==============DESKTOP PATH==============")
   print(desktop_path)
   for each in file_paths:
     file_path_list.append(os.path.abspath(os.path.join(desktop_path, each)))
-
-  # for file_path in file_path_list:
-  #   print(file_path)
-    # print(absolute_path)
-    # print(os.path.exists(absolute_path))
-
-  # print('========SCALES=======')
-  # print(scales)
-
-  # print('========LENGTH=======')
-  # print(length)
-
-  # print('========FREQUENCY=======')
-  # print(frequency)
-
-  # print('========CHANNELS=======')
-  # for channel in channels:
-    # print(channel)
-
 
   data = None
   data2 = None
@@ -98,20 +79,19 @@ def main(analysis_name, file_paths, channels, scales, length, frequency):
             "fun3 data": data3,
             "fun4 data": data4
             }
-  print(json.dumps(fun_obj))
+
   f= open(f"{analysis_name}.txt","w+")
   f.write(json.dumps(fun_obj))
   print("here is file path")
-  print(os.path.abspath(f"{analysis_name}.txt"))
-  os.remove(os.path.abspath(f"{analysis_name}.txt"))
-  print("File Removed!")
+  for each in file_paths:
+    print(os.path.abspath(os.path.join(desktop_path, f"{each}")))
+    os.remove(os.path.abspath(os.path.join(desktop_path, f"{each}")))
+    print("File Removed!")
 
 
 def get_subject_data(paths):
   # print("IN POINT 4")
   data = pd.read_csv(paths)
-  print("==============DATA==============")
-  print(data)
   return data
 
 def get_file_names(complete_file_paths):
@@ -121,12 +101,7 @@ def get_file_names(complete_file_paths):
   return file_names
 
 def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_single_channel(Mobj, channel, scale, frequency, length, file_path):
-  # print("IN POINT 5")
-  print("==============FILE PATH==============")
-  print(file_path)
   data = get_subject_data(file_path)
-  print("==============DATA==============")
-  print(data)
   data = data.iloc[:, 1:]
   ch_names = data.columns
   # print("##################### names #####################", ch_names[0])
@@ -259,26 +234,20 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_mu
             "CI": ci_df["CI"].tolist()
         }
     }
-  # print("=====================================")
-  # print(graph_data)
-  # print("=====================================")
   return graph_data
 
 def multi_subject_and_multi_channel(Mobj, fixed_channels, scales, frequency, length, paths):
   all_data_dict = {} # initialize an empty dictionary to which each subject's data will be added
   trimmed_data_length = np.arange(0, length*frequency) # define the length of data to trim down to
   subject_list = get_file_names(paths) # get the list of subject names
-  # print("==============SUBJECT LIST================")
-  # print(subject_list)
+
   for subject_name in tqdm(paths):
-    # print("==============SUBJECT NAME================")
-    # print(subject_name)
+
     data = get_subject_data(subject_name)
     data = data.iloc[:,1:] # remove the first column because that column is the timestamps column
     data = data.iloc[trimmed_data_length,:] # trim the data to just the first 30sec
     all_data_dict[subject_name] = data # add the current subject's data to the dict
-    # print("==============ALL DATA DICT================")
-    # print(all_data_dict)
+
 
   data = get_subject_data(paths[0])
   scales_list = np.arange(1, scales+1)
@@ -348,8 +317,6 @@ def multi_subject_and_multi_channel(Mobj, fixed_channels, scales, frequency, len
             'CI': ci_across_subjects_df['CI'].tolist()
         }
     }
-  # print("================IN POINT 7=====================")
-  # print(graph_data)
   return graph_data
 
 def multi_subject_and_single_channel(Mobj, fixed_channels, scales, frequency, length, paths):
@@ -373,7 +340,6 @@ def multi_subject_and_single_channel(Mobj, fixed_channels, scales, frequency, le
 
   # Loop through each subject and store their data
   for subject in tqdm(paths):
-    # print("====================")
     data = get_subject_data(subject)
     data = data.iloc[:,1:]  # Remove the first column (timestamps)
     data = data.iloc[trimmed_data_length,:]  # Trim to the first 30sec
@@ -449,8 +415,6 @@ def multi_subject_and_single_channel(Mobj, fixed_channels, scales, frequency, le
             'CI': ci_single_channel_df['CI'].tolist()
         }
     }
-  # print("================IN POINT 9=====================")
-  # print(graph_data)
   return graph_data
 
 ################################## MAIN ##################################
@@ -469,7 +433,6 @@ if __name__ == "__main__":
 
   # Parse command-line arguments
   args = parser.parse_args()
-  print(args.subject_list)
   # Call the specified function with arguments
   if args.function == 'main':
       main(args.analysis_name, args.subject_list, args.channels, args.scales, args.length, args.frequency)
