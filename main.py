@@ -66,12 +66,6 @@ def main(analysis_name, file_paths, channels, scales, length, frequency):
   second_function = {
     "data": fun_2
     }
-  # third_function = {
-  #     'data': fun_3
-  #   }
-  # fourth_function = {
-  #     'data': data4
-  #   }
 
   fun_obj = {
             "fun1 data": first_function,
@@ -79,8 +73,8 @@ def main(analysis_name, file_paths, channels, scales, length, frequency):
             "fun3 data": data3,
             "fun4 data": data4
             }
-
-  f= open(f"{analysis_name}.txt","w+")
+  file_write_path = os.path.join(os.getcwd(), f"{analysis_name}.txt")
+  f= open(file_write_path,"w+")
   f.write(json.dumps(fun_obj))
   print("here is file path")
   for each in file_paths:
