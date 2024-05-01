@@ -43,18 +43,24 @@ def main(analysis_name, file_paths, channels, scales, length, frequency):
   
   for file_path in file_path_list:
   #   ############################FUNCTION 1############################
-    data = single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_single_channel(Mobj, fixed_channels, scales, frequency, length, file_path)
-    fun_1.append(data)
-
+    #point 5
+    if len(fixed_channels) == 1:
+      data = single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_single_channel(Mobj, fixed_channels, scales, frequency, length, file_path)
+      fun_1.append(data)
+    else: 
     ############################FUNCTION 2############################
-    data2 = single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_multi_channel(Mobj, fixed_channels, scales, frequency, length, file_path)
-    fun_2.append(data2)
+    #point 6
+    #GENERATES ONLY FIRST AND SECOND GRAPH
+    #SHOULD PASS ON THE CHANNEL NAMES
+      data2 = single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_multi_channel(Mobj, fixed_channels, scales, frequency, length, file_path)
+      fun_2.append(data2)
 
   ############################FUNCTION 3############################
-  data3 = multi_subject_and_multi_channel(Mobj, fixed_channels, scales, frequency, length, file_path_list)
+  # data3 = multi_subject_and_multi_channel(Mobj, fixed_channels, scales, frequency, length, file_path_list)
 
   ############################FUNCTION 4############################
-  data4 = multi_subject_and_single_channel(Mobj, fixed_channels, scales, frequency, length, file_path_list)
+  # THE THRID GRAPH IS IN THERE
+  # data4 = multi_subject_and_single_channel(Mobj, fixed_channels, scales, frequency, length, file_path_list)
 
 
   # print("================= FINAL OUTPUT =================")
@@ -70,8 +76,8 @@ def main(analysis_name, file_paths, channels, scales, length, frequency):
   fun_obj = {
             "fun1 data": first_function,
             "fun2 data": second_function,
-            "fun3 data": data3,
-            "fun4 data": data4
+            # "fun3 data": data3,
+            # "fun4 data": data4
             }
   file_write_path = os.path.join(os.getcwd(), f"{analysis_name}.txt")
   f= open(file_write_path,"w+")
@@ -149,10 +155,10 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_si
   # fig.show()
 
   graph_data = {
-        # 'Sample_Entropy': {
-        #     'scales_list': scales_list.tolist(),
-        #     'Msx': Msx.tolist()
-        # },
+        'Sample_Entropy': {
+            'scales_list': scales_list.tolist(),
+            'Msx': Msx.tolist()
+        },
         'Complexity_Index': {
             'channel': target_channel,
             'CI': CI
@@ -166,8 +172,12 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_mu
 
   data = get_subject_data(file_path)
   data = data.iloc[:, 1:]
-  ch_names = data.columns
-  # print(ch_names)
+  # print("==============INCOMING================")
+  # print(pd.Index(ch_names, dtype='object'))
+
+  # print("==============OUTCOMING================")
+  # ch_names = data.columns
+  ch_names = pd.Index(ch_names, dtype='object')
 
   sfreq = frequency
 #   time = np.linspace(0, data.shape[0]/sfreq, data.shape[0])
@@ -183,13 +193,11 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_mu
   ci_df = pd.DataFrame(columns=['Channel','CI'])
 
   for ch in tqdm(ch_names):
-      ch_data = data[ch].values
-
-      Msx, CI = EntropyHub.MSEn(ch_data, Mobj, Scales=scales)
-
-      mse_series = pd.Series({ch:Msx})
-      mse_across_channels_df[ch] = Msx
-      ci_df = ci_df.append(pd.Series({'Channel':ch, 'CI':CI}), ignore_index=True)
+    ch_data = data[ch].values
+    Msx, CI = EntropyHub.MSEn(ch_data, Mobj, Scales=scales)
+    mse_series = pd.Series({ch:Msx})
+    mse_across_channels_df[ch] = Msx
+    ci_df = ci_df.append(pd.Series({'Channel':ch, 'CI':CI}), ignore_index=True)
 
   fig = make_subplots(cols=2, column_widths=[0.2,0.4], horizontal_spacing=0.08)
   colorscale = 'cividis'
@@ -204,8 +212,8 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_mu
   mean_mse = mse_across_channels_df.mean(axis=1).values
   sem_mse = mse_across_channels_df.sem(axis=1).values
   fig.add_trace(go.Scattergl(x=scales_list, y=mean_mse, error_y=dict(type='data', array=sem_mse, visible=True),
-                             mode='lines+markers', line=dict(color='brown', width=6),
-                             marker=dict(color='brown', size=12), name='Average'), row=1, col=1)
+                            mode='lines+markers', line=dict(color='brown', width=6),
+                            marker=dict(color='brown', size=12), name='Average'), row=1, col=1)
 
   fig.add_trace(go.Bar(x=ci_df['Channel'], y=ci_df['CI'], marker=dict(color=colors, line=dict(color='black', width=1)), showlegend=False), row=1, col=2)
 
