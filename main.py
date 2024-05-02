@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import math
 import sys
 import os
 import logging.handlers
@@ -74,10 +75,10 @@ def main(analysis_name, file_paths, channels, scales, length, frequency):
     }
 
   fun_obj = {
-            "fun1 data": first_function,
-            "fun2 data": second_function,
-            # "fun3 data": data3,
-            # "fun4 data": data4
+            "fun1_data": first_function,
+            "fun2_data": second_function,
+            # "fun3_data": data3,
+            # "fun4_data": data4
             }
   file_write_path = os.path.join(os.getcwd(), f"{analysis_name}.txt")
   f= open(file_write_path,"w+")
@@ -103,8 +104,6 @@ def get_file_names(complete_file_paths):
 def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_single_channel(Mobj, channel, scale, frequency, length, file_path):
   data = get_subject_data(file_path)
   data = data.iloc[:, 1:]
-  ch_names = data.columns
-  # print("##################### names #####################", ch_names[0])
 
   sfreq = frequency
   time = np.linspace(0, data.shape[0]/sfreq, data.shape[0])
@@ -167,6 +166,52 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_si
 
   return graph_data
 
+def fix_ci(ci_list):
+  fixed_ci_list = []
+  for ci in ci_list:
+    if math.isnan(ci):
+      fixed_ci_list.append(0.0)
+    elif math.isinf(ci):
+      fixed_ci_list.append(100.0)
+    else:
+      fixed_ci_list.append(ci)
+  return fixed_ci_list
+
+def fix_mean_mse(mean_mse):
+  fixed_mean_mse_list = []
+  for mse in mean_mse:
+    if math.isnan(mse):
+      fixed_mean_mse_list.append(0.0)
+    elif math.isinf(mse):
+      fixed_mean_mse_list.append(100.0)
+    else:
+      fixed_mean_mse_list.append(mse)
+  return fixed_mean_mse_list
+
+def fix_sem_mse(sem_mse):
+  fix_sem_mse_list = []
+  for sem in sem_mse:
+    if math.isnan(sem):
+      fix_sem_mse_list.append(0.0)
+    elif math.isinf(sem):
+      fix_sem_mse_list.append(100.0)
+    else:
+      fix_sem_mse_list.append(sem)
+  return fix_sem_mse_list
+
+def fix_mse(mse_values):
+  fixed_mse_values = []
+  for mse in mse_values:
+    fixed_mse_list = []
+    for val in mse:
+      if math.isnan(val):
+        fixed_mse_list.append(0.0)
+      elif math.isinf(val):
+        fixed_mse_list.append(100.0)
+      else:
+        fixed_mse_list.append(val)
+    fixed_mse_values.append(fixed_mse_list)
+  return fixed_mse_values
 
 def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_multi_channel(Mobj, ch_names, scale, frequency, length, file_path):
 
@@ -207,7 +252,7 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_mu
       mse_vals = mse_across_channels_df[ch].values
       mse_values.append(mse_vals)
       fig.add_trace(go.Scattergl(x=scales_list, y=mse_vals, mode='lines+markers', line=dict(color=colors[i]),
-                                 marker=dict(color=colors[i], size=8), name=ch), row=1, col=1)
+                                marker=dict(color=colors[i], size=8), name=ch), row=1, col=1)
 
   mean_mse = mse_across_channels_df.mean(axis=1).values
   sem_mse = mse_across_channels_df.sem(axis=1).values
@@ -224,16 +269,21 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_mu
 
   mse_values = [arr.tolist() for arr in mse_values]
 
+  fixed_ci_list = fix_ci(ci_df["CI"])
+  fixed_mean_mse_list = fix_mean_mse(mean_mse)
+  fixed_sem_mse_list = fix_sem_mse(sem_mse)
+  fixed_mse_values = fix_mse(mse_values)
+
   graph_data = {
         "Sample_Entropy": {
             "scales_list": scales_list.tolist(),
-            "mean_mse_channels_average": mean_mse.tolist(),
-            "sem_mse_subject_average": sem_mse.tolist(),
-            "mse_vals_channel_values": mse_values
+            "mean_mse_channels_average": fixed_mean_mse_list,
+            "sem_mse_subject_average": fixed_sem_mse_list,
+            "mse_vals_channel_values": fixed_mse_values
         },
         "Complexity_Index": {
             "channel": ch_names.tolist(),
-            "CI": ci_df["CI"].tolist()
+            "CI": fixed_ci_list
         }
     }
   return graph_data
