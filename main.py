@@ -227,9 +227,9 @@ def single_subject_sample_entropy_at_multiple_scales_and_complexity_index_for_mu
   graph_data = {
         "Sample_Entropy": {
             "scales_list": scales_list.tolist(),
-            "mean_mse": mean_mse.tolist(),
-            "sem_mse": sem_mse.tolist(),
-            "mse_vals": mse_values
+            "mean_mse_channels_average": mean_mse.tolist(),
+            "sem_mse_subject_average": sem_mse.tolist(),
+            "mse_vals_channel_values": mse_values
         },
         "Complexity_Index": {
             "channel": ch_names.tolist(),
