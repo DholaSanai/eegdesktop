@@ -1,6 +1,12 @@
 ./edvenv
 edvenv
 
+./dtenv
+dtenv
+
+./env
+env
+
 ./build.sh
 build
 
