@@ -82,7 +82,7 @@ def main(analysis_name, file_paths, channels, scales, length, frequency):
   file_write_path = os.path.join(os.getcwd(), f"{analysis_name}.txt")
   f= open(file_write_path,"w+")
   f.write(json.dumps(fun_obj))
-  print("here is file path")
+  print("here is file path: ", file_write_path)
   for each in file_paths:
     print(os.path.abspath(os.path.join(desktop_path, f"{each}")))
     os.remove(os.path.abspath(os.path.join(desktop_path, f"{each}")))
